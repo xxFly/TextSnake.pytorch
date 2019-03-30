@@ -12,7 +12,7 @@ Input format: y0,x0, ..... yn,xn. Each detection is separated by the end of line
 """
 
 input_dir = 'output'
-gt_dir = 'data/total-text/gt/Test'
+gt_dir = 'data/ArT/total-text/gt/Test'
 fid_path = 'Python_Pascal_result_last_check.txt'
 
 allInputs = listdir(input_dir)

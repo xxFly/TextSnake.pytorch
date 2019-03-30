@@ -109,14 +109,14 @@ def validation(model, valid_loader, criterion):
 def main():
 
     trainset = TotalText(
-        data_root='data/total-text',
+        data_root='data/ArT/total-text',
         ignore_list='./dataset/total_text/ignore_list.txt',
         is_training=True,
         transform=Augmentation(size=cfg.input_size, mean=cfg.means, std=cfg.stds)
     )
 
     valset = TotalText(
-        data_root='data/total-text',
+        data_root='data/ArT/total-text',
         ignore_list=None,
         is_training=False,
         transform=BaseTransform(size=cfg.input_size, mean=cfg.means, std=cfg.stds)
@@ -137,13 +137,13 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=10000, gamma=0.94)
 
-    print('Start training TextSnake.')
+    print('Start training TextSnake.'+time.strftime('%Y.%m.%d',time.localtime(time.time())))
 
     for epoch in range(cfg.start_epoch, cfg.max_epoch):
         train(model, train_loader, criterion, scheduler, optimizer, epoch)
         validation(model, val_loader, criterion)
 
-    print('End.')
+    print('End.'+time.strftime('%Y.%m.%d',time.localtime(time.time())))
 
 if __name__ == "__main__":
     # parse arguments

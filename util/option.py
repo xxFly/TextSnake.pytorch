@@ -32,6 +32,8 @@ class BaseOptions(object):
         self.parser.add_argument('--cuda', default=True, type=str2bool, help='Use cuda to train model')
         self.parser.add_argument('--save_dir', default='./save/', help='Path to save checkpoint models')
         self.parser.add_argument('--vis_dir', default='./vis/', help='Path to save visualization images')
+        self.parser.add_argument('--output_dir', default='./output/', help='Path to save visualization txt')
+        self.parser.add_argument('--label_dir', default='../data/', help='Path to save label files')
         self.parser.add_argument('--train_csv', default='../data/train.csv', type=str, help='Path of training label files')
         self.parser.add_argument('--val_csv', default='../data/val.csv', type=str, help='Path of validation label files')
         self.parser.add_argument('--loss', default='CrossEntropyLoss', type=str, help='Training Loss')
@@ -96,6 +98,18 @@ class BaseOptions(object):
 
         if not os.path.exists(model_save_path):
             os.mkdir(model_save_path)
+
+        # Create vis saving directory
+        if not os.path.exists(self.args.vis_dir):
+            os.mkdir(self.args.vis_dir)
+
+        # Create output saving directory
+        if not os.path.exists(self.args.output_dir):
+            os.mkdir(self.args.output_dir)
+
+        # Create label directory
+        if not os.path.exists(self.args.label_dir):
+            os.mkdir(self.args.label_dir)
 
         return self.args
 

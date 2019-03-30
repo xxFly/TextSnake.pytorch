@@ -16,6 +16,8 @@ from util.option import BaseOptions
 from util.visualize import visualize_detection
 import cv2
 
+import time
+
 def result2polygon(image, result):
     """ convert geometric info(center_x, center_y, radii) into contours
     :param result: (list), each with (n, 3), 3 denotes (x, y, radii)
@@ -26,7 +28,8 @@ def result2polygon(image, result):
         for x, y, r in disk:
             cv2.circle(mask, (int(x), int(y)), int(r), (1), -1)
 
-    _, conts, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # _, conts, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    conts, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     conts = [cont[:, 0, :] for cont in conts]
     return conts
 
@@ -64,7 +67,7 @@ def inference(model, detector, test_loader):
             img, train_mask, tr_mask, tcl_mask, radius_map, sin_map, cos_map)
         # inference
         output = model(img)
-
+        print("-------------------------"+img.size(0)+"-------------------------")
         for idx in range(img.size(0)):
             print('detect {} / {} images: {}.'.format(i, len(test_loader), meta['image_id'][idx]))
 
@@ -82,10 +85,11 @@ def inference(model, detector, test_loader):
             contours = result2polygon(img_show, batch_result)
 
             predict_vis = visualize_detection(img_show, tr_pred[1], tcl_pred[1], contours)
-            gt_vis = visualize_detection(img_show, tr_mask[idx].cpu().numpy(), tcl_mask[idx].cpu().numpy(), contours)
-            im_vis = np.concatenate([predict_vis, gt_vis], axis=0)
+            # gt_vis = visualize_detection(img_show, tr_mask[idx].cpu().numpy(), tcl_mask[idx].cpu().numpy(), contours)
+            # im_vis = np.concatenate([predict_vis, gt_vis], axis=0)
             path = os.path.join(cfg.vis_dir, '{}_{}'.format(i, meta['image_id'][idx]))
-            cv2.imwrite(path, im_vis)
+            # cv2.imwrite(path, im_vis)
+            cv2.imwrite(path, predict_vis)
 
             H, W = meta['Height'][idx].item(), meta['Width'][idx].item()
             img_show, contours = rescale_result(img_show, contours, H, W)
@@ -95,7 +99,7 @@ def inference(model, detector, test_loader):
 def main():
 
     testset = TotalText(
-        data_root='data/total-text',
+        data_root='data/ArT/total-text',
         ignore_list=None,
         is_training=False,
         transform=BaseTransform(size=cfg.input_size, mean=cfg.means, std=cfg.stds)
@@ -114,11 +118,11 @@ def main():
         cudnn.benchmark = True
     detector = TextDetector()
 
-    print('Start testing TextSnake.')
+    print('Start testing TextSnake.'+time.strftime('%Y.%m.%d',time.localtime(time.time())))
 
     inference(model, detector, test_loader)
 
-    print('End.')
+    print('End.'+time.strftime('%Y.%m.%d',time.localtime(time.time())))
 
 
 if __name__ == "__main__":

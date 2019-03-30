@@ -161,8 +161,9 @@ class TextDetector(object):
 
         # find disjoint regions
         mask = fill_hole(tcl_pred)
-        _, conts, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
+        # _, conts, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        conts, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~conts:"+conts+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         for cont in conts:
             # remove small regions
             if cv2.contourArea(cont) < 20:

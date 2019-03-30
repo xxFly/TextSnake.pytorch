@@ -5,6 +5,8 @@ import os
 from dataset.data_util import pil_load_img
 from dataset.dataload import TextDataset, TextInstance
 
+import json
+
 class TotalText(TextDataset):
 
     def __init__(self, data_root, ignore_list=None, is_training=True, transform=None):
@@ -31,20 +33,33 @@ class TotalText(TextDataset):
         :param mat_path: (str), mat file path
         :return: (list), TextInstance
         """
-        annot = io.loadmat(mat_path)
+        # annot = io.loadmat(mat_path)
+        # polygon = []
+        # for cell in annot['polygt']:
+        #     x = cell[1][0]
+        #     y = cell[3][0]
+        #     text = cell[4][0]
+        #     if len(x) < 4: # too few points
+        #         continue
+        #     try:
+        #         ori = cell[5][0]
+        #     except:
+        #         ori = 'c'
+        #     pts = np.stack([x, y]).T.astype(np.int32)
+        #     polygon.append(TextInstance(pts, ori, text))
+
+        # 读取json
         polygon = []
-        for cell in annot['polygt']:
-            x = cell[1][0]
-            y = cell[3][0]
-            text = cell[4][0]
-            if len(x) < 4: # too few points
-                continue
-            try:
-                ori = cell[5][0]
-            except:
-                ori = 'c'
-            pts = np.stack([x, y]).T.astype(np.int32)
-            polygon.append(TextInstance(pts, ori, text))
+        with open('../task1and3/ArT-detection-example/ArT-detection-example/detection_result.json') as f:
+            load_dict = json.load(f)
+            for cell in load_dict.values():
+                for item in cell:
+                    pts = item['points']
+                    if len(pts) < 4:  # too few points
+                        continue
+                    ori = 'c'
+                    text = 'x'
+                    polygon.append(TextInstance(pts, ori, text))
         return polygon
 
     def __getitem__(self, item):
@@ -81,8 +96,8 @@ if __name__ == '__main__':
     )
 
     trainset = TotalText(
-        data_root='data/total-text',
-        ignore_list='./ignore_list.txt',
+        data_root='data/ArT/otal-text',
+        ignore_list='./tignore_list.txt',
         is_training=True,
         transform=transform
     )
